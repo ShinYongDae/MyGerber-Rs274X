@@ -288,7 +288,7 @@ void CMyGerberDlg::MyLineList(float X1, float Y1, float X2, float Y2, int nListN
 	if (m_pOpengl)
 	{
 		int nSizeLine = 1;
-		DrawBegin(Opengl::modLine, nSizeLine, RGB_RED);
+		DrawBegin(Opengl::modLine, nSizeLine, RGB_BLUE);
 		m_pOpengl->MyLineList(X1, Y1, X2, Y2, nListNum);
 		DrawEnd();
 	}
@@ -406,11 +406,11 @@ void CMyGerberDlg::DrawRect(const CfPoint3D &fptStart, const CfPoint3D &fptEnd, 
 		{
 			if (width != 0)
 			{
-				DrawBegin(Opengl::modCircleE, width, RGB_RED);
+				DrawBegin(Opengl::modCircleE, width, RGB_BLUE);
 			}
 			else
 			{
-				DrawBegin(Opengl::modCircleE, nSizeLine, RGB_RED);
+				DrawBegin(Opengl::modCircleE, nSizeLine, RGB_BLUE);
 			}
 		}
 		m_pOpengl->DrawRect(fptStart, fptEnd, width, fill);

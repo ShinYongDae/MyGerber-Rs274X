@@ -611,7 +611,6 @@ BOOL CSimple274X::Decode(CString sFileData)
 
 	ResetData();
 	ResetDataObject(m_gObj);
-	InitLayerMaxExtent();
 
 	Decoding(pData, pLine); // Load Gerber File and upload at m_gObj...
 
@@ -4594,6 +4593,8 @@ void CSimple274X::ResetData()
 	m_MaxFrameExtent.Y1 = fMaxData;
 	m_MaxFrameExtent.Y2 = -fMaxData;
 
+	InitLayerMaxExtent();
+
 	m_dDetZero = 0.000001;
 	// 	m_fFiducialDrillSize = 1.5;
 	// 	m_nDrillSuppress = 0;
@@ -4603,6 +4604,7 @@ void CSimple274X::ResetData()
 	// 	m_bFindLineObjPickingMode = FALSE;
 	m_bImageSave = FALSE;
 
+	m_fptCoord.x = 0.0; m_fptCoord.y = 0.0; 
 }
 
 void CSimple274X::ResetDataObject(GraphObj &gObj)
@@ -5730,6 +5732,9 @@ void CSimple274X::Draw274X()
 
 	int nRealW = rtFrame.X2 - rtFrame.X1;
 	int nRealH = rtFrame.Y2 - rtFrame.Y1;
+
+	if (nRealW == 0.0) nRealW = m_nWorldW;
+	if (nRealH == 0.0) nRealH = m_nWorldH;
 
 	int nNeedX, nNeedY;
 	if ((m_nWorldW - nRealW) < 0.0)

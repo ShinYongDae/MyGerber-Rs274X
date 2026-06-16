@@ -777,7 +777,7 @@ void CSimpleOpengl::Draw()
 	if (nTotal <= 0)	return;
 
 	//color.R = 1.0; color.G = 0.0; color.B = 0.0; color.A = 0.0;
-	DrawBegin(Opengl::modLine, 1, RGB_RED);//color
+	DrawBegin(Opengl::modLine, 1, RGB_BLUE);//color
 
 	for (i = 0; i < nTotal; i++)
 	{
