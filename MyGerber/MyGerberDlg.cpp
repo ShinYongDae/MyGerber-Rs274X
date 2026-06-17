@@ -21,9 +21,15 @@ CMyGerberDlg::CMyGerberDlg(CWnd* pParent /*=NULL*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_pDc = NULL;
+
 	m_pOpengl = NULL;
 	m_p274X = NULL;
 
+	m_pDlgProgress = NULL;
+	m_sDlgProgressCaption = _T("");
+
+	m_bProc = FALSE; m_bProcFunc = FALSE;
+	ThreadStart();
 	//m_pCamMaster = NULL;
 	//m_pOpenGLView = NULL;
 	//m_pOpenGLDraw = NULL;
@@ -49,7 +55,14 @@ CMyGerberDlg::~CMyGerberDlg()
 	//	delete m_pOpenGLView;
 	//	m_pOpenGLView = NULL;
 	//}
+	ProgressClose();
 
+	ThreadStop();
+	while (m_bProc)
+	{
+		Sleep(30);
+	}
+	t.join();
 
 	if (m_p274X)
 	{
@@ -61,6 +74,12 @@ CMyGerberDlg::~CMyGerberDlg()
 	{
 		delete m_pOpengl;
 		m_pOpengl = NULL;
+	}
+
+	if (m_pDlgProgress != NULL)
+	{
+		delete m_pDlgProgress;
+		m_pDlgProgress = NULL;
 	}
 
 	if (m_pDc)
@@ -80,9 +99,78 @@ BEGIN_MESSAGE_MAP(CMyGerberDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BTN_OPEN_GERB, &CMyGerberDlg::OnBnClickedBtnOpenGerb)
-	//ON_MESSAGE(WM_USER_GL_REDRAW_CAM, OnGlRedrawCam)
+	ON_MESSAGE(WM_PROC_FUNC_0, &CMyGerberDlg::ProcFunc)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
+
+void CMyGerberDlg::ThreadActivate(BOOL bRun)
+{
+	m_bProcFunc = bRun;
+}
+
+BOOL CMyGerberDlg::ThreadIsActivate()
+{
+	return m_bProcFunc;
+}
+
+BOOL CMyGerberDlg::ThreadIsAlive()
+{
+	return m_bProc;
+}
+
+BOOL CMyGerberDlg::ThreadIsStop()
+{
+	return m_bThreadAlive;
+}
+
+void CMyGerberDlg::ProcThrd(const LPVOID lpContext)
+{
+	CMyGerberDlg* pMyGerberDlg = reinterpret_cast<CMyGerberDlg*>(lpContext);
+
+	pMyGerberDlg->m_bProc = TRUE;
+	while (pMyGerberDlg->ThreadIsStop())
+	{
+		if (!pMyGerberDlg->Proc())
+			break;
+	}
+	pMyGerberDlg->m_bProc = FALSE;
+}
+
+BOOL CMyGerberDlg::Proc()
+{
+	if (m_bProc)
+	{
+		if (m_bProcFunc)
+		{
+			::PostMessage(m_hWnd, WM_PROC_FUNC_0, 0, 0);
+		}
+	}
+	Sleep(100);
+	return TRUE;
+}
+
+LRESULT CMyGerberDlg::ProcFunc(WPARAM wPara, LPARAM lPara)
+{
+	if (!m_bProcFunc)	return 0L;
+
+	return 0L;
+}
+
+void CMyGerberDlg::ThreadStart()
+{
+	m_bThreadAlive = TRUE;
+	t = std::thread(ProcThrd, this);
+}
+
+void CMyGerberDlg::ThreadStop()
+{
+	m_bThreadAlive = FALSE;
+	MSG message;
+	const DWORD dwTimeOut = 1000 * 60 * 3; // 3 Minute
+	DWORD dwStartTick = GetTickCount();
+	Sleep(30);
+}
 
 // CMyGerberDlg 메시지 처리기
 
@@ -99,6 +187,7 @@ BOOL CMyGerberDlg::OnInitDialog()
 	InitOpengl();
 	Init274X();
 
+	SetTimer(0, 100, NULL);
 	//InitCamMaster();
 	//InitGLViewer();
 
@@ -139,6 +228,71 @@ void CMyGerberDlg::OnPaint()
 HCURSOR CMyGerberDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
+}
+
+void CMyGerberDlg::ProgressActivate(BOOL bRun)
+{
+	if (m_pDlgProgress != NULL)
+	{
+		m_pDlgProgress->ThreadActivate(bRun);
+	}
+}
+
+void CMyGerberDlg::ProgressSet(int nPos, int nMin, int nMax)
+{
+	if (!m_pDlgProgress)
+	{
+		m_pDlgProgress = new CDlgProgress(this);
+		if (m_pDlgProgress->GetSafeHwnd() == 0)
+		{
+			m_pDlgProgress->Create(m_sDlgProgressCaption);
+			if (nMin < 0 || nMax < 0)
+				m_pDlgProgress->SetRange(0, 100);
+			else
+			{
+				m_pDlgProgress->SetRange(nMin, nMax);
+			}
+			m_pDlgProgress->SetStep(1);
+			m_pDlgProgress->ThreadActivate(TRUE);
+
+			m_pDlgProgress->SetPos(nPos);
+			m_pDlgProgress->ShowWindow(SW_SHOW);
+		}
+	}
+	else
+	{
+		m_pDlgProgress->SetPos(nPos);
+	}
+
+	//m_pDlgProgress->ShowWindow(SW_SHOW);
+}
+
+void CMyGerberDlg::ProgressClose()
+{
+	if (m_pDlgProgress != NULL)
+	{
+		m_pDlgProgress->ThreadActivate(FALSE);
+		m_pDlgProgress->ThreadStop();
+		while (m_pDlgProgress->ThreadIsAlive())
+		{
+			Sleep(30);
+		}
+		delete m_pDlgProgress;
+		m_pDlgProgress = NULL;
+	}
+}
+
+int CMyGerberDlg::ProgressGet()
+{
+	int nPos = 0;
+	if (!m_pDlgProgress) return nPos;
+	nPos = m_pDlgProgress->GetPos();
+	return nPos;
+}
+
+void CMyGerberDlg::ProgressSetDlgCaption(CString sCaption)
+{
+	m_sDlgProgressCaption = sCaption;
 }
 
 
@@ -380,7 +534,7 @@ void CMyGerberDlg::DrawQuad(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2, GLfl
 	if (m_pOpengl)
 	{
 		if (fill)
-			DrawBegin(Opengl::modRectF, nSizeLine, RGB_BLUE);
+			DrawBegin(Opengl::modRectF, nSizeLine, RGB_SKYBLUE);
 		else
 			DrawBegin(Opengl::modCircleE, nSizeLine, RGB_GREEN);
 		m_pOpengl->DrawQuad(x1, y1, x2, y2, x3, y3, x4, y4, fill);
@@ -546,3 +700,15 @@ double CMyGerberDlg::GetScaleOfScreen()
 //
 //	return 0L;
 //}
+
+
+void CMyGerberDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
+	if (nIDEvent == 0)
+	{
+		KillTimer(nIDEvent);
+	}
+
+	CDialog::OnTimer(nIDEvent);
+}

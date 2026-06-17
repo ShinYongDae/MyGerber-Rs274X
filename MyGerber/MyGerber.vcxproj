@@ -184,6 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DefineColor.h" />
+    <ClInclude Include="DlgProgress.h" />
     <ClInclude Include="MyGerber.h" />
     <ClInclude Include="MyGerberDlg.h" />
     <ClInclude Include="PostfixCalc.h" />
@@ -195,6 +196,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DlgProgress.cpp" />
     <ClCompile Include="MyGerber.cpp" />
     <ClCompile Include="MyGerberDlg.cpp" />
     <ClCompile Include="PostfixCalc.cpp" />

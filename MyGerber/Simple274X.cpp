@@ -668,10 +668,27 @@ BOOL CSimple274X::Decode(CString sFileData)
 
 BOOL CSimple274X::Decoding(char* pFile, char* pLine)
 {
+	int nLen = 0, nLenFirst = 0;
 	CString strErrMsg;
+
+	CMyGerberDlg* pParent = (CMyGerberDlg*)m_pParent;
+	//if (pParent)
+	//{
+	//	nLenFirst = strlen(pFile);
+	//	pParent->ProgressSetDlgCaption(_T("On Loading Gerber File..."));
+	//	pParent->ProgressSet(0, 0, nLenFirst);
+	//}
 
 	while (!m_bLastFrame)
 	{
+		//nLen = strlen(pFile);
+		//if (pParent)
+		//	pParent->ProgressSet(nLenFirst - nLen);
+		//	pParent->ProgressSet(1000);
+		//if (nLen < 10)
+		//{
+		//	int kkk = 0;
+		//}
 		DecodingParsingFlag();
 
 		if (DecodingIgnore(&pFile, &pLine))
@@ -687,6 +704,9 @@ BOOL CSimple274X::Decoding(char* pFile, char* pLine)
 		AfxMessageBox(strErrMsg);
 		m_bLastFrame = TRUE;
 	}
+
+	//if (pParent)
+	//	pParent->ProgressClose();
 
 	return TRUE;
 }

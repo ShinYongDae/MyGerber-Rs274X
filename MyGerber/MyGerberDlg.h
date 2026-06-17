@@ -7,7 +7,9 @@
 
 #include "SimpleOpengl.h"
 #include "Simple274X.h"
+#include "DlgProgress.h"
 
+#define WM_PROC_FUNC_0		(WM_USER+1)
 
 // CMyGerberDlg 대화 상자
 class CMyGerberDlg : public CDialog
@@ -23,11 +25,31 @@ class CMyGerberDlg : public CDialog
 	CSimple274X *m_p274X;
 	BOOL Init274X();
 
+	CDlgProgress* m_pDlgProgress;
+	CString m_sDlgProgressCaption;
 
-	CCriticalSection m_cs;
+	//CCriticalSection m_cs;
 	//CCamMaster *m_pCamMaster;
 	//BOOL InitCamMaster();
 	//BOOL InitGLViewer();
+
+private:
+	BOOL m_bThreadAlive;// , m_bThreadStateEnd;
+	std::thread t;
+	BOOL m_bProc, m_bProcFunc;
+	void ThreadStart();
+
+protected:
+	BOOL Proc();
+	BOOL ThreadIsActivate();
+	BOOL ThreadIsAlive();
+	BOOL ThreadIsStop();
+
+public:
+	static void ProcThrd(const LPVOID lpContext);
+	afx_msg LRESULT ProcFunc(WPARAM wPara, LPARAM lPara);
+	void ThreadActivate(BOOL bRun);
+	void ThreadStop();
 
 // 생성입니다.
 public:
@@ -35,9 +57,10 @@ public:
 	~CMyGerberDlg();
 
 // 대화 상자 데이터입니다.
-#ifdef AFX_DESIGN_TIME
+//#ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_MYGERBER_DIALOG };
-#endif
+//#endif
+
 
 public:
 	//COpenGLView *m_pOpenGLView;
@@ -72,6 +95,12 @@ public:
 	double GetScaleOfScreen();
 	COLORREF GetObjectColorCurrent();
 
+	void ProgressActivate(BOOL bRun = TRUE);
+	void ProgressSet(int nPos, int nMin = -1, int nMax = -1);
+	void ProgressClose();
+	int ProgressGet();
+	void ProgressSetDlgCaption(CString sCaption);
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 
@@ -88,4 +117,5 @@ protected:
 public:
 	//afx_msg LRESULT  OnGlRedrawCam(WPARAM wPara, LPARAM lPara);
 	afx_msg void OnBnClickedBtnOpenGerb();
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
