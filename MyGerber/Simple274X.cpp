@@ -671,24 +671,36 @@ BOOL CSimple274X::Decoding(char* pFile, char* pLine)
 	int nLen = 0, nLenFirst = 0;
 	CString strErrMsg;
 
+	DWORD CurTimer, StartTimer;
+	StartTimer = GetTickCount();
+
 	CMyGerberDlg* pParent = (CMyGerberDlg*)m_pParent;
-	//if (pParent)
-	//{
-	//	nLenFirst = strlen(pFile);
-	//	pParent->ProgressSetDlgCaption(_T("On Loading Gerber File..."));
-	//	pParent->ProgressSet(0, 0, nLenFirst);
-	//}
+	MSG message;
+	if (pParent)
+	{
+		nLenFirst = strlen(pFile);
+		pParent->ProgressSetDlgCaption(_T("On Loading Gerber File..."));
+		pParent->ProgressSet(0, 0, nLenFirst);
+	}
 
 	while (!m_bLastFrame)
 	{
-		//nLen = strlen(pFile);
-		//if (pParent)
-		//	pParent->ProgressSet(nLenFirst - nLen);
-		//	pParent->ProgressSet(1000);
-		//if (nLen < 10)
-		//{
-		//	int kkk = 0;
-		//}
+		CurTimer = GetTickCount();
+		BOOL bTrig = !(int(CurTimer - StartTimer) % 100);
+		if (bTrig)
+		{
+			nLen = strlen(pFile);
+			if (pParent)
+			{
+				pParent->ProgressSet(nLenFirst - nLen);
+				if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+				{
+					::TranslateMessage(&message);
+					::DispatchMessage(&message);
+				}
+			}
+		}
+
 		DecodingParsingFlag();
 
 		if (DecodingIgnore(&pFile, &pLine))
@@ -705,8 +717,11 @@ BOOL CSimple274X::Decoding(char* pFile, char* pLine)
 		m_bLastFrame = TRUE;
 	}
 
-	//if (pParent)
-	//	pParent->ProgressClose();
+	if (pParent)
+	{
+		pParent->ProgressSet(nLenFirst);
+		pParent->ProgressClose();
+	}
 
 	return TRUE;
 }

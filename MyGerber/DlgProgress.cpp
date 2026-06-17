@@ -87,14 +87,14 @@ void CDlgProgress::ProcThrd(const LPVOID lpContext)
 
 LRESULT CDlgProgress::ProcFunc(WPARAM wPara, LPARAM lPara)
 {
-	//if (m_nPos != m_nPosPrev)
-	//{
-	//	SetPos();
-	//	UpdatePercent(m_nPos);
-	//}
 	if (!m_bProcFunc)	return 0L;
 
-	int iResult = m_ctrlProgress.SetPos(100);
+	if (m_nPos != m_nPosPrev)
+	{
+		SetPos();
+		UpdatePercent(m_nPos);
+	}
+
 	return 0L;
 }
 
