@@ -1058,10 +1058,33 @@ void CSimpleOpengl::OnRButtonDown(UINT nFlags, CPoint point)
 
 void CSimpleOpengl::Draw274X()
 {
+	MSG message;
+
 	CMyGerberDlg* pParent = (CMyGerberDlg*)m_pParent;
-	pParent->Draw274X();
-	glFlush();											// 그림이 다 그렸졌다는 걸 알려줌. 모든 명령어를 실행되게 함.
-	SwapBuffers(m_hDc);									// OpenGL이 완료한 그림을 새롭게 화면에 그린다 - 현재 buffer에 그려진 것과 Frame에 그려진 것을 swap(Double buffer), 그리기 함수에서 glFlush 대신 사용
+	if (pParent)
+	{
+		pParent->Draw274X();
+
+		//pParent->ProgressSetDlgCaption(_T("On Flushing Gerber File..."));
+		//pParent->ProgressSet(0, 0, 2);
+		//if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+		//{
+		//	::TranslateMessage(&message);
+		//	::DispatchMessage(&message);
+		//}
+
+		glFlush();											// 그림이 다 그렸졌다는 걸 알려줌. 모든 명령어를 실행되게 함.
+		//pParent->ProgressSet(1);
+		//if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+		//{
+		//	::TranslateMessage(&message);
+		//	::DispatchMessage(&message);
+		//}
+
+		SwapBuffers(m_hDc);									// OpenGL이 완료한 그림을 새롭게 화면에 그린다 - 현재 buffer에 그려진 것과 Frame에 그려진 것을 swap(Double buffer), 그리기 함수에서 glFlush 대신 사용
+		//pParent->ProgressSet(2);
+		//pParent->ProgressActivate(FALSE);//pParent->ProgressClose();
+	}
 }
 
 //void CSimpleOpengl::Drawing_0()

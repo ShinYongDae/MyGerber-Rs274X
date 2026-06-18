@@ -19,6 +19,7 @@
 CMyGerberDlg::CMyGerberDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(IDD_MYGERBER_DIALOG, pParent)
 {
+	m_bActivated = FALSE;
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_pDc = NULL;
 
@@ -191,6 +192,7 @@ BOOL CMyGerberDlg::OnInitDialog()
 	//InitCamMaster();
 	//InitGLViewer();
 
+	m_bActivated = TRUE;
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -232,6 +234,7 @@ HCURSOR CMyGerberDlg::OnQueryDragIcon()
 
 void CMyGerberDlg::ProgressActivate(BOOL bRun)
 {
+	if (!m_bActivated) return;
 	if (m_pDlgProgress != NULL)
 	{
 		m_pDlgProgress->ThreadActivate(bRun);
@@ -251,6 +254,7 @@ void CMyGerberDlg::ProgressActivate(BOOL bRun)
 
 void CMyGerberDlg::ProgressSet(int nPos, int nMin, int nMax)
 {
+	if (!m_bActivated) return;
 	if (!m_pDlgProgress)
 	{
 		m_pDlgProgress = new CDlgProgress(this);
@@ -305,6 +309,7 @@ void CMyGerberDlg::ProgressSet(int nPos, int nMin, int nMax)
 
 void CMyGerberDlg::ProgressClose()
 {
+	if (!m_bActivated) return;
 	if (m_pDlgProgress != NULL)
 	{
 		m_pDlgProgress = NULL;
@@ -323,6 +328,7 @@ void CMyGerberDlg::ProgressClose()
 
 int CMyGerberDlg::ProgressGet()
 {
+	if (!m_bActivated) return 0;
 	int nPos = 0;
 	if (!m_pDlgProgress) return nPos;
 	nPos = m_pDlgProgress->GetPos();
@@ -331,7 +337,10 @@ int CMyGerberDlg::ProgressGet()
 
 void CMyGerberDlg::ProgressSetDlgCaption(CString sCaption)
 {
+	if (!m_bActivated) return;
 	m_sDlgProgressCaption = sCaption;
+	if (m_pDlgProgress)
+		m_pDlgProgress->SetWindowText(sCaption);
 }
 
 

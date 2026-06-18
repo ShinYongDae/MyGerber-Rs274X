@@ -14,6 +14,7 @@
 // CMyGerberDlg 대화 상자
 class CMyGerberDlg : public CDialog
 {
+	BOOL m_bActivated;
 	CDC* m_pDc;
 	BOOL FileBrowse(CString& sPath);
 	void LoadGerbFile(CString sPath);

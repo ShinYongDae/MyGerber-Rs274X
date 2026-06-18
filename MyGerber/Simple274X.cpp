@@ -668,31 +668,33 @@ BOOL CSimple274X::Decode(CString sFileData)
 
 BOOL CSimple274X::Decoding(char* pFile, char* pLine)
 {
-	int nLen = 0, nLenFirst = 0;
+	int nLen = 0;
 	CString strErrMsg;
 
 	DWORD CurTimer, StartTimer;
+	MSG message;
 	StartTimer = GetTickCount();
 
 	CMyGerberDlg* pParent = (CMyGerberDlg*)m_pParent;
-	MSG message;
+	int nRpt = 0; int nTotRpt = strlen(pFile); BOOL bTrig = FALSE;
 	if (pParent)
 	{
-		nLenFirst = strlen(pFile);
 		pParent->ProgressSetDlgCaption(_T("On Loading Gerber File..."));
-		pParent->ProgressSet(0, 0, nLenFirst);
+		pParent->ProgressSet(0, 0, nTotRpt);
 	}
 
 	while (!m_bLastFrame)
 	{
 		CurTimer = GetTickCount();
-		BOOL bTrig = !(int(CurTimer - StartTimer) % 100); // 100mSec간격으로 ProgressBar 진행.
+		bTrig = (int(CurTimer - StartTimer) % 300) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
+		nRpt = int(CurTimer - StartTimer) % 300;
 		if (bTrig)
 		{
+			nRpt = 0;
 			nLen = strlen(pFile);
 			if (pParent)
 			{
-				pParent->ProgressSet(nLenFirst - nLen);
+				pParent->ProgressSet(nTotRpt - nLen);
 				if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
 				{
 					::TranslateMessage(&message);
@@ -719,7 +721,7 @@ BOOL CSimple274X::Decoding(char* pFile, char* pLine)
 
 	if (pParent)
 	{
-		pParent->ProgressSet(nLenFirst);
+		pParent->ProgressSet(nTotRpt);
 		pParent->ProgressActivate(FALSE);//pParent->ProgressClose();
 	}
 
@@ -5850,14 +5852,15 @@ void CSimple274X::Drawing_0()
 
 
 	DWORD CurTimer, StartTimer;
+	MSG message;
 	StartTimer = GetTickCount();
 
+	int nRpt = 0; int nTotRpt = nNumOfObj; BOOL bTrig = FALSE;
 	CMyGerberDlg* pParent = (CMyGerberDlg*)m_pParent;
-	MSG message;
 	if (pParent)
 	{
 		pParent->ProgressSetDlgCaption(_T("On Drawing Gerber File..."));
-		pParent->ProgressSet(0, 0, nNumOfObj);
+		pParent->ProgressSet(0, 0, nTotRpt);
 	}
 
 
@@ -5866,22 +5869,6 @@ void CSimple274X::Drawing_0()
 
 	for (nObjIndex = nSt; nObjIndex < nNumOfObj; nObjIndex++)
 	{
-		CurTimer = GetTickCount();
-		BOOL bTrig = !(int(CurTimer - StartTimer) % 100); // 100mSec간격으로 ProgressBar 진행.
-		if (bTrig)
-		{
-			if (pParent)
-			{
-				pParent->ProgressSet(nObjIndex);
-				if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
-				{
-					::TranslateMessage(&message);
-					::DispatchMessage(&message);
-				}
-			}
-		}
-
-
 		gObj = m_pLayerInfo->listObj.at(nObjIndex);
 
 		if (m_bCheckDraw && gObj.Type.nType != DRAW_TYPE::SNR)
@@ -5908,8 +5895,24 @@ void CSimple274X::Drawing_0()
 			DrawObject(nObjIndex);
 			//DrawObject_0(nObjIndex);//MyObjEntity(nObjIndex, bCheck);
 		}
+		
+		CurTimer = GetTickCount();
+		bTrig = (int(CurTimer - StartTimer) % 300) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
+		nRpt = int(CurTimer - StartTimer) % 300;
+		if (bTrig)
+		{
+			nRpt = 0;
+			if (pParent)
+			{
+				pParent->ProgressSet(nObjIndex);
+				if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+				{
+					::TranslateMessage(&message);
+					::DispatchMessage(&message);
+				}
+			}
+		}
 	}
-
 
 	if (pParent)
 	{
@@ -7236,6 +7239,21 @@ BOOL CSimple274X::MySnRObjList(GraphObj &gObj, int nObjIndex, float ddX, float d
 	nXRepeat = m_pLayerInfo->vecObjCoord[gObj.nStPnt + 1].x;
 	nYRepeat = m_pLayerInfo->vecObjCoord[gObj.nStPnt + 1].y;
 
+	DWORD CurTimer, StartTimer;
+	MSG message; BOOL bTrig = FALSE;
+	StartTimer = GetTickCount();
+
+	CMyGerberDlg* pParent = (CMyGerberDlg*)m_pParent;
+	int nRpt = 0; int nTotRpt = nXRepeat * nYRepeat;
+	if (!pParent) return FALSE;
+
+	pParent->ProgressSetDlgCaption(_T("On Drawing SnRObjList..."));
+	pParent->ProgressSet(0, 0, nTotRpt);
+	if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+	{
+		::TranslateMessage(&message);
+		::DispatchMessage(&message);
+	}
 
 	if (gObj.dCode > 0 && m_fCanvasPixelResolution > m_fDrawArcResolution) // 1/10 of Monitor Pixel resolution
 	{
@@ -7268,6 +7286,21 @@ BOOL CSimple274X::MySnRObjList(GraphObj &gObj, int nObjIndex, float ddX, float d
  					//	int ttt=0;
  					//}
 				}
+
+				CurTimer = GetTickCount();
+				bTrig = (int(CurTimer - StartTimer) % 300) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
+				nRpt = int(CurTimer - StartTimer) % 300;
+				if (bTrig)
+				{
+					nRpt = 0;
+					pParent->ProgressSet(j + nYRepeat * i);
+					if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+					{
+						::TranslateMessage(&message);
+						::DispatchMessage(&message);
+					}
+				}
+
 			}
 		}
 	}
@@ -7294,10 +7327,31 @@ BOOL CSimple274X::MySnRObjList(GraphObj &gObj, int nObjIndex, float ddX, float d
 							MyObjEntityShift(k, dX, dY);
 						}
 					}
+					//Sleep(30);
 				}
+
+				CurTimer = GetTickCount();
+				bTrig = (int(CurTimer - StartTimer) % 300) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
+				nRpt = int(CurTimer - StartTimer) % 300;
+				if (bTrig)
+				{
+					nRpt = 0;
+					pParent->ProgressSet(j + nYRepeat * i);
+					if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+					{
+						::TranslateMessage(&message);
+						::DispatchMessage(&message);
+					}
+				}
+
 			}
+			//Sleep(30);
 		}
+		//Sleep(30);
 	}
+
+	pParent->ProgressSet(nTotRpt);
+	pParent->ProgressActivate(FALSE);//pParent->ProgressClose();
 
 	return bFind;
 }
@@ -8154,10 +8208,11 @@ BOOL CSimple274X::MyObjEntityShift(int k, float dX, float dY)
 	int pNum = 0;
 	int nID = 0, nIndex = 0;
 	TEMPLATE_KEY Key;
+	if (k >= m_pLayerInfo->listObj.size())
+		return FALSE;
 
-	float *fParam;
-
-	GraphObj gObj = m_pLayerInfo->listObj.at(k);
+	float *fParam; GraphObj gObj;
+	gObj = m_pLayerInfo->listObj.at(k);
 
 	if (gObj.Type.nAttr == DRAW_TYPE::NONE)
 		return FALSE;
