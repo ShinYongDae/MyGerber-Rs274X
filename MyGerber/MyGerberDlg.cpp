@@ -25,7 +25,7 @@ CMyGerberDlg::CMyGerberDlg(CWnd* pParent /*=NULL*/)
 	m_pOpengl = NULL;
 	m_p274X = NULL;
 
-	m_pDlgProgress = NULL;
+	m_pDlgProgress = NULL; m_bDlgProgress = FALSE;
 	m_sDlgProgressCaption = _T("");
 
 	m_bProc = FALSE; m_bProcFunc = FALSE;
@@ -235,6 +235,17 @@ void CMyGerberDlg::ProgressActivate(BOOL bRun)
 	if (m_pDlgProgress != NULL)
 	{
 		m_pDlgProgress->ThreadActivate(bRun);
+
+		if (bRun)
+		{
+			if (!m_pDlgProgress->IsWindowVisible())
+				m_pDlgProgress->ShowWindow(SW_SHOW);
+		}
+		else
+		{
+			if (m_pDlgProgress->IsWindowVisible())
+				m_pDlgProgress->ShowWindow(SW_HIDE);
+		}
 	}
 }
 
@@ -245,24 +256,49 @@ void CMyGerberDlg::ProgressSet(int nPos, int nMin, int nMax)
 		m_pDlgProgress = new CDlgProgress(this);
 		if (m_pDlgProgress->GetSafeHwnd() == 0)
 		{
-			m_pDlgProgress->Create(m_sDlgProgressCaption);
-			if (nMin < 0 || nMax < 0)
-				m_pDlgProgress->SetRange(0, 100);
-			else
-			{
-				m_pDlgProgress->SetRange(nMin, nMax);
-			}
-			m_pDlgProgress->SetStep(1);
-			m_pDlgProgress->ThreadActivate(TRUE);
+			//if (!m_bDlgProgress)
+			m_bDlgProgress = m_pDlgProgress->Create(m_sDlgProgressCaption);
 
-			m_pDlgProgress->SetPos(nPos);
-			m_pDlgProgress->ShowWindow(SW_SHOW);
+			//if (nMin < 0 || nMax < 0)
+			//	m_pDlgProgress->SetRange(0, 100);
+			//else
+			//{
+			//	m_pDlgProgress->SetRange(nMin, nMax);
+			//}
+			//m_pDlgProgress->SetStep(1);
+			//m_pDlgProgress->ThreadActivate(TRUE);
+
+			//m_pDlgProgress->SetPos(nPos);
+			//if (!m_pDlgProgress->IsWindowVisible())
+			//	m_pDlgProgress->ShowWindow(SW_SHOW);
 		}
 	}
 	else
 	{
-		m_pDlgProgress->SetPos(nPos);
+		//if (nMin < 0 || nMax < 0)
+		//	m_pDlgProgress->SetRange(0, 100);
+		//else
+		//	m_pDlgProgress->SetRange(nMin, nMax);
+
+		//m_pDlgProgress->SetStep(1);
+		//m_pDlgProgress->ThreadActivate(TRUE);
+		//m_pDlgProgress->SetPos(nPos);
+		//if (!m_pDlgProgress->IsWindowVisible())
+		//	m_pDlgProgress->ShowWindow(SW_SHOW);
 	}
+
+	if (nMin < 0 || nMax < 0)
+		m_pDlgProgress->SetRange(0, 100);
+	else
+	{
+		m_pDlgProgress->SetRange(nMin, nMax);
+	}
+	m_pDlgProgress->SetStep(1);
+	m_pDlgProgress->ThreadActivate(TRUE);
+
+	m_pDlgProgress->SetPos(nPos);
+	if (!m_pDlgProgress->IsWindowVisible())
+		m_pDlgProgress->ShowWindow(SW_SHOW);
 
 	//m_pDlgProgress->ShowWindow(SW_SHOW);
 }
@@ -271,14 +307,17 @@ void CMyGerberDlg::ProgressClose()
 {
 	if (m_pDlgProgress != NULL)
 	{
-		m_pDlgProgress->ThreadActivate(FALSE);
-		m_pDlgProgress->ThreadStop();
-		while (m_pDlgProgress->ThreadIsAlive())
-		{
-			Sleep(30);
-		}
-		delete m_pDlgProgress;
 		m_pDlgProgress = NULL;
+		//m_pDlgProgress->ThreadActivate(FALSE);
+		//m_pDlgProgress->ThreadStop();
+		//while (m_pDlgProgress->ThreadIsAlive())
+		//{
+		//	Sleep(30);
+		//}
+		//m_pDlgProgress->Free();
+		//m_pDlgProgress->DestroyWindow();
+		////delete m_pDlgProgress;
+		//m_pDlgProgress = NULL;
 	}
 }
 

@@ -21,6 +21,7 @@ class CDlgProgress : public CDialog
 	int m_nPosPrev;	// 이전 진행량.
 	double m_dDevide;
 
+	BOOL m_bDlgProgress;
 	BOOL UpdatePercent(int nNewPos);
 
 private:
@@ -53,6 +54,7 @@ public:
 	void SetPos();
 	void SetPos(int nPos);
 	int GetPos();
+	void Free();
 
 // 대화 상자 데이터입니다.
 //#ifdef AFX_DESIGN_TIME
@@ -64,7 +66,8 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 public:
-	CProgressCtrl m_ctrlProgress;
+	//CProgressCtrl m_ctrlProgress;
 	virtual BOOL OnInitDialog();
 	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
+	virtual void PostNcDestroy();
 };

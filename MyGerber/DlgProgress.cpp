@@ -24,6 +24,8 @@ CDlgProgress::CDlgProgress(CWnd* pParent /*=NULL*/)
 	m_dDevide = 1.0;
 	m_nStep = 1;
 	m_nPos = 0; m_nPosPrev = 0;
+
+	m_bDlgProgress = FALSE;
 }
 
 CDlgProgress::~CDlgProgress()
@@ -34,12 +36,13 @@ CDlgProgress::~CDlgProgress()
 		Sleep(30);
 	}
 	t0.join();
+	m_bDlgProgress = FALSE;
 }
 
 void CDlgProgress::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_PROGRESS, m_ctrlProgress);
+	//DDX_Control(pDX, IDC_PROGRESS, m_ctrlProgress);
 }
 
 
@@ -68,7 +71,7 @@ BOOL CDlgProgress::ThreadIsAlive()
 
 BOOL CDlgProgress::ThreadIsStop()
 {
-	return m_bThreadAlive;
+	return !m_bThreadAlive;
 }
 
 void CDlgProgress::ProcThrd(const LPVOID lpContext)
@@ -76,7 +79,7 @@ void CDlgProgress::ProcThrd(const LPVOID lpContext)
 	CDlgProgress* pDlgProgress = reinterpret_cast<CDlgProgress*>(lpContext);
 
 	pDlgProgress->m_bProc = TRUE;
-	while (pDlgProgress->ThreadIsStop())
+	while (!pDlgProgress->ThreadIsStop())
 	{
 		if (!pDlgProgress->Proc())
 			break;
@@ -128,7 +131,15 @@ void CDlgProgress::ThreadStop()
 BOOL CDlgProgress::Create(CString sCaption)
 {
 	m_sCaption = sCaption;
-	BOOL bRtn = CDialog::Create(CDlgProgress::IDD, m_pParent);
+
+	BOOL bRtn = TRUE;
+	if (!m_bDlgProgress)
+		bRtn = CDialog::Create(CDlgProgress::IDD, m_pParent);
+	//BOOL bRtn = CDialog::Create(_T("1"), m_pParent);
+	if (!bRtn)
+	{
+		AfxMessageBox(_T("Faile to Create DlgProgress."));
+	}
 	return bRtn;
 }
 
@@ -165,13 +176,15 @@ void CDlgProgress::SetPos()
 	//	m_nPos = nPos;
 	//	m_bProcFunc = TRUE;
 	//}
+	CProgressCtrl* pWndProgress = (CProgressCtrl*)GetDlgItem(IDC_PROGRESS);
 	int nPos = m_nPos;
 
 	if (m_nPos != m_nPosPrev)
 	{
 		m_nPosPrev = m_nPos;
 		nPos /= m_dDevide;
-		int iResult = m_ctrlProgress.SetPos(nPos);
+		int iResult = pWndProgress->SetPos(nPos);
+		//int iResult = m_ctrlProgress.SetPos(nPos);
 		UpdatePercent(m_nPos);
 		//if (!UpdatePercent(m_nPos))
 		//	OnOK();
@@ -185,6 +198,7 @@ int CDlgProgress::GetPos()
 
 void CDlgProgress::SetRange(int nLower, int nUpper)
 {
+	CProgressCtrl* pWndProgress = (CProgressCtrl*)GetDlgItem(IDC_PROGRESS);
 	m_nLower = nLower;
 	m_nUpper = nUpper;
 	if (nUpper > MAX_RANGE_PROGRESS)
@@ -196,16 +210,23 @@ void CDlgProgress::SetRange(int nLower, int nUpper)
 	{
 		m_dDevide = 1.0;
 	}
-	m_ctrlProgress.SetRange(nLower, nUpper);
+	pWndProgress->SetRange(nLower, nUpper);
+	//m_ctrlProgress.SetRange(nLower, nUpper);
 
-	ThreadStart();
+	if (!m_bDlgProgress)
+	{
+		m_bDlgProgress = TRUE;
+		ThreadStart();
+	}
 }
 
 int CDlgProgress::SetStep(int nStep)
 {
+	CProgressCtrl* pWndProgress = (CProgressCtrl*)GetDlgItem(IDC_PROGRESS);
 	m_nStep = nStep; // Store for later use in calculating percentage
 	nStep /= m_dDevide;
-	return m_ctrlProgress.SetStep(nStep);
+	return pWndProgress->SetStep(nStep);
+	//return m_ctrlProgress.SetStep(nStep);
 }
 
 BOOL CDlgProgress::UpdatePercent(int nNewPos)
@@ -264,4 +285,21 @@ void CDlgProgress::OnShowWindow(BOOL bShow, UINT nStatus)
 		this->MoveWindow(pRect, TRUE);
 		delete pRect;
 	}
+}
+
+void CDlgProgress::Free()
+{
+	//CProgressCtrl* pWndProgress = (CProgressCtrl*)GetDlgItem(IDC_PROGRESS);
+	//CStatic* pWndPercent = (CStatic*)GetDlgItem(IDC_STATUS);
+	//pWndProgress->DestroyWindow();
+	//pWndPercent->DestroyWindow();
+	////delete pWndProgress;
+	////delete pWndPercent;
+}
+
+void CDlgProgress::PostNcDestroy()
+{
+	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	delete this;
+	CDialog::PostNcDestroy();
 }

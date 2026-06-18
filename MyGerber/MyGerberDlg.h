@@ -25,7 +25,7 @@ class CMyGerberDlg : public CDialog
 	CSimple274X *m_p274X;
 	BOOL Init274X();
 
-	CDlgProgress* m_pDlgProgress;
+	CDlgProgress* m_pDlgProgress; BOOL m_bDlgProgress;
 	CString m_sDlgProgressCaption;
 
 	//CCriticalSection m_cs;

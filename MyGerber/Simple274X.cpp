@@ -686,7 +686,7 @@ BOOL CSimple274X::Decoding(char* pFile, char* pLine)
 	while (!m_bLastFrame)
 	{
 		CurTimer = GetTickCount();
-		BOOL bTrig = !(int(CurTimer - StartTimer) % 100);
+		BOOL bTrig = !(int(CurTimer - StartTimer) % 100); // 100mSec간격으로 ProgressBar 진행.
 		if (bTrig)
 		{
 			nLen = strlen(pFile);
@@ -720,7 +720,7 @@ BOOL CSimple274X::Decoding(char* pFile, char* pLine)
 	if (pParent)
 	{
 		pParent->ProgressSet(nLenFirst);
-		pParent->ProgressClose();
+		pParent->ProgressActivate(FALSE);//pParent->ProgressClose();
 	}
 
 	return TRUE;
@@ -5846,11 +5846,41 @@ void CSimple274X::Drawing_0()
  	//m_nPrevAttribute = 16;
  	//m_nPrevPolarity = 3;
 	//CDrawRs274X m_DrawRs274X(this);
+
+
+
+	DWORD CurTimer, StartTimer;
+	StartTimer = GetTickCount();
+
+	CMyGerberDlg* pParent = (CMyGerberDlg*)m_pParent;
+	MSG message;
+	if (pParent)
+	{
+		pParent->ProgressSetDlgCaption(_T("On Drawing Gerber File..."));
+		pParent->ProgressSet(0, 0, nNumOfObj);
+	}
+
+
+
 	SetPixelResolution(m_dPixelResolution);
 
 	for (nObjIndex = nSt; nObjIndex < nNumOfObj; nObjIndex++)
 	{
-		//DispProgress(nObjIndex, nNumOfObj);
+		CurTimer = GetTickCount();
+		BOOL bTrig = !(int(CurTimer - StartTimer) % 100); // 100mSec간격으로 ProgressBar 진행.
+		if (bTrig)
+		{
+			if (pParent)
+			{
+				pParent->ProgressSet(nObjIndex);
+				if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+				{
+					::TranslateMessage(&message);
+					::DispatchMessage(&message);
+				}
+			}
+		}
+
 
 		gObj = m_pLayerInfo->listObj.at(nObjIndex);
 
@@ -5878,6 +5908,13 @@ void CSimple274X::Drawing_0()
 			DrawObject(nObjIndex);
 			//DrawObject_0(nObjIndex);//MyObjEntity(nObjIndex, bCheck);
 		}
+	}
+
+
+	if (pParent)
+	{
+		pParent->ProgressSet(nNumOfObj);
+		pParent->ProgressActivate(FALSE);//pParent->ProgressClose();
 	}
 
 	//m_DrawRs274X.CallApertureList();
