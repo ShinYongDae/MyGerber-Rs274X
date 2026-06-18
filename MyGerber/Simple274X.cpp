@@ -401,8 +401,9 @@ void CSimple274X::DeleteLayerInfo()
 
 void CSimple274X::StringToChar(CString str, char* szStr)  // char* returned must be deleted... 
 {
-	int nLen = str.GetLength();
+	//int nLen = str.GetLength();
 	strcpy(szStr, CT2A(str));
+	int nLen = strlen(szStr);
 	szStr[nLen] = _T('\0');
 }
 
@@ -483,7 +484,7 @@ CString CSimple274X::Load(CString sPath)
 
 	//파일을 불러옴. 
 	int nLen = sPath.GetLength();
-	char* pData = new char[nLen + 1]; // for '\0'
+	char* pData = new char[nLen * 2 + 1]; // for Korean + '\0'
 	StringToChar(sPath, pData);
 	strcpy(FileD, pData);
 	delete pData;
@@ -7244,21 +7245,21 @@ BOOL CSimple274X::MySnRObjList(GraphObj &gObj, int nObjIndex, float ddX, float d
 	nXRepeat = m_pLayerInfo->vecObjCoord[gObj.nStPnt + 1].x;
 	nYRepeat = m_pLayerInfo->vecObjCoord[gObj.nStPnt + 1].y;
 
-	//DWORD CurTimer, StartTimer;
-	//MSG message; BOOL bTrig = FALSE;
-	//StartTimer = GetTickCount();
+	DWORD CurTimer, StartTimer;
+	MSG message; BOOL bTrig = FALSE;
+	StartTimer = GetTickCount();
 
-	//CMyGerberDlg* pParent = (CMyGerberDlg*)m_pParent;
-	//int nRpt = 0; int nTotRpt = nXRepeat * nYRepeat;
-	//if (!pParent) return FALSE;
+	CMyGerberDlg* pParent = (CMyGerberDlg*)m_pParent;
+	int nRpt = 0; int nTotRpt = nXRepeat * nYRepeat;
+	if (!pParent) return FALSE;
 
-	//pParent->ProgressSetDlgCaption(_T("On Drawing SnRObjList..."));
-	//pParent->ProgressSet(0, 0, nTotRpt);
-	//if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
-	//{
-	//	::TranslateMessage(&message);
-	//	::DispatchMessage(&message);
-	//}
+	pParent->ProgressSetDlgCaption(_T("On Drawing SnRObjList..."));
+	pParent->ProgressSet(0, 0, nTotRpt);
+	if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+	{
+		::TranslateMessage(&message);
+		::DispatchMessage(&message);
+	}
 
 	if (gObj.dCode > 0 && m_fCanvasPixelResolution > m_fDrawArcResolution) // 1/10 of Monitor Pixel resolution
 	{
@@ -7292,19 +7293,19 @@ BOOL CSimple274X::MySnRObjList(GraphObj &gObj, int nObjIndex, float ddX, float d
  					//}
 				}
 
-				//CurTimer = GetTickCount();
-				//bTrig = (int(CurTimer - StartTimer) % 100) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
-				//nRpt = int(CurTimer - StartTimer) % 100;
-				//if (bTrig)
-				//{
-				//	nRpt = 0;
-				//	pParent->ProgressSet(j + nYRepeat * i);
-				//	if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
-				//	{
-				//		::TranslateMessage(&message);
-				//		::DispatchMessage(&message);
-				//	}
-				//}
+				CurTimer = GetTickCount();
+				bTrig = (int(CurTimer - StartTimer) % 100) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
+				nRpt = int(CurTimer - StartTimer) % 100;
+				if (bTrig)
+				{
+					nRpt = 0;
+					pParent->ProgressSet(j + nYRepeat * i);
+					if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+					{
+						::TranslateMessage(&message);
+						::DispatchMessage(&message);
+					}
+				}
 
 			}
 		}
@@ -7341,19 +7342,19 @@ BOOL CSimple274X::MySnRObjList(GraphObj &gObj, int nObjIndex, float ddX, float d
 					//Sleep(30);
 				}
 
-				//CurTimer = GetTickCount();
-				//bTrig = (int(CurTimer - StartTimer) % 100) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
-				//nRpt = int(CurTimer - StartTimer) % 100;
-				//if (bTrig)
-				//{
-				//	nRpt = 0;
-				//	pParent->ProgressSet(j + nYRepeat * i);
-				//	if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
-				//	{
-				//		::TranslateMessage(&message);
-				//		::DispatchMessage(&message);
-				//	}
-				//}
+				CurTimer = GetTickCount();
+				bTrig = (int(CurTimer - StartTimer) % 100) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
+				nRpt = int(CurTimer - StartTimer) % 100;
+				if (bTrig)
+				{
+					nRpt = 0;
+					pParent->ProgressSet(j + nYRepeat * i);
+					if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+					{
+						::TranslateMessage(&message);
+						::DispatchMessage(&message);
+					}
+				}
 
 			}
 			//Sleep(30);
@@ -7361,8 +7362,8 @@ BOOL CSimple274X::MySnRObjList(GraphObj &gObj, int nObjIndex, float ddX, float d
 		//Sleep(30);
 	}
 
-	//pParent->ProgressSet(nTotRpt);
-	//pParent->ProgressActivate(FALSE);//pParent->ProgressClose();
+	pParent->ProgressSet(nTotRpt);
+	pParent->ProgressActivate(FALSE);//pParent->ProgressClose();
 
 	return bFind;
 }
