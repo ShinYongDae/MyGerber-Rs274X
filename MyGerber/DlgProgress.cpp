@@ -240,7 +240,7 @@ BOOL CDlgProgress::UpdatePercent(int nNewPos)
 	int nDividend = (nNewPos - m_nLower);
 	ASSERT(nDividend >= 0);   // Current position should be greater than m_nLower
 
-	nPercent = nDividend * 100 / nDivisor;
+	nPercent = (int)(((double)nDividend / (double)nDivisor) * 100.0);
 
 	// Since the Progress Control wraps, we will wrap the percentage
 	// along with it. However, don't reset 100% back to 0%
@@ -252,6 +252,11 @@ BOOL CDlgProgress::UpdatePercent(int nNewPos)
 	// Display the percentage
 	CString strBuf;
 	strBuf.Format(_T("%d%c"), nPercent, _T('%'));
+
+	if (nPercent < 0)
+	{
+		int kkk = 0;
+	}
 
 	CString strCur; // get current percentage
 	pWndPercent->GetWindowText(strCur);

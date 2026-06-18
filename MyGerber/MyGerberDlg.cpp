@@ -291,13 +291,14 @@ void CMyGerberDlg::ProgressSet(int nPos, int nMin, int nMax)
 		//	m_pDlgProgress->ShowWindow(SW_SHOW);
 	}
 
-	if (nMin < 0 || nMax < 0)
-		m_pDlgProgress->SetRange(0, 100);
-	else
+	//if (nMin < 0 || nMax < 0)
+	//	;//m_pDlgProgress->SetRange(0, 100);
+	//else
+	if (nMin >= 0 && nMax > 0)
 	{
 		m_pDlgProgress->SetRange(nMin, nMax);
+		m_pDlgProgress->SetStep(1);
 	}
-	m_pDlgProgress->SetStep(1);
 	m_pDlgProgress->ThreadActivate(TRUE);
 
 	m_pDlgProgress->SetPos(nPos);

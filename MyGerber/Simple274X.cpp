@@ -686,8 +686,8 @@ BOOL CSimple274X::Decoding(char* pFile, char* pLine)
 	while (!m_bLastFrame)
 	{
 		CurTimer = GetTickCount();
-		bTrig = (int(CurTimer - StartTimer) % 300) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
-		nRpt = int(CurTimer - StartTimer) % 300;
+		bTrig = (int(CurTimer - StartTimer) % 100) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
+		nRpt = int(CurTimer - StartTimer) % 100;
 		if (bTrig)
 		{
 			nRpt = 0;
@@ -2870,7 +2870,8 @@ BOOL CSimple274X::ApertureDefinition(char** pFile)
 				if (nPrimitive > 0)
 				{
 					m_AptPrimi.nPriNum = nPrimitive;
-					m_pAptDef->Param.push_back(m_AptPrimi);
+					if (m_AptPrimi.fParam.size() > 0)
+						m_pAptDef->Param.push_back(m_AptPrimi);
 					m_AptPrimi.fParam.clear();
 				}
 
@@ -2924,7 +2925,8 @@ BOOL CSimple274X::ApertureDefinition(char** pFile)
 
 			m_AptPrimi.nPriNum = 0;
 			m_pAptDef->minmax = m_AptPrimi.minmax;
-			m_pAptDef->Param.push_back(m_AptPrimi);
+			if (m_AptPrimi.fParam.size() > 0)
+				m_pAptDef->Param.push_back(m_AptPrimi);
 			m_AptPrimi.fParam.clear();
 
 			m_pLayerInfo->mapAptList.SetAt(m_nDCode, m_pAptDef);
@@ -5897,8 +5899,8 @@ void CSimple274X::Drawing_0()
 		}
 		
 		CurTimer = GetTickCount();
-		bTrig = (int(CurTimer - StartTimer) % 300) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
-		nRpt = int(CurTimer - StartTimer) % 300;
+		bTrig = (int(CurTimer - StartTimer) % 100) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
+		nRpt = int(CurTimer - StartTimer) % 100;
 		if (bTrig)
 		{
 			nRpt = 0;
@@ -6587,6 +6589,8 @@ COLORREF CSimple274X::GetSnRObjectColor(GraphObj &obj)
 
 void CSimple274X::GetArcVertices(vector<FPOINTC> &vecPt, const FPOINTC &ptCenter, float radius, float start_angle, float arc_angle, int dir)
 {
+	//return;
+
 	float theta, tangetial_factor, radial_factor;
 	float x, y, tx, ty;
 	FPOINTC BufPt;
@@ -7231,6 +7235,7 @@ BOOL CSimple274X::MySnRObjList(GraphObj &gObj, int nObjIndex, float ddX, float d
 	dX = 0;
 	dY = 0;
 
+	int nSz = m_pLayerInfo->vecObjCoord.size();
 	frtCurrentExtent = m_FrameExtent;//GetFrameExtent();
 
 	nStObj = m_pLayerInfo->vecObjCoord[gObj.nStPnt].x;
@@ -7239,21 +7244,21 @@ BOOL CSimple274X::MySnRObjList(GraphObj &gObj, int nObjIndex, float ddX, float d
 	nXRepeat = m_pLayerInfo->vecObjCoord[gObj.nStPnt + 1].x;
 	nYRepeat = m_pLayerInfo->vecObjCoord[gObj.nStPnt + 1].y;
 
-	DWORD CurTimer, StartTimer;
-	MSG message; BOOL bTrig = FALSE;
-	StartTimer = GetTickCount();
+	//DWORD CurTimer, StartTimer;
+	//MSG message; BOOL bTrig = FALSE;
+	//StartTimer = GetTickCount();
 
-	CMyGerberDlg* pParent = (CMyGerberDlg*)m_pParent;
-	int nRpt = 0; int nTotRpt = nXRepeat * nYRepeat;
-	if (!pParent) return FALSE;
+	//CMyGerberDlg* pParent = (CMyGerberDlg*)m_pParent;
+	//int nRpt = 0; int nTotRpt = nXRepeat * nYRepeat;
+	//if (!pParent) return FALSE;
 
-	pParent->ProgressSetDlgCaption(_T("On Drawing SnRObjList..."));
-	pParent->ProgressSet(0, 0, nTotRpt);
-	if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
-	{
-		::TranslateMessage(&message);
-		::DispatchMessage(&message);
-	}
+	//pParent->ProgressSetDlgCaption(_T("On Drawing SnRObjList..."));
+	//pParent->ProgressSet(0, 0, nTotRpt);
+	//if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+	//{
+	//	::TranslateMessage(&message);
+	//	::DispatchMessage(&message);
+	//}
 
 	if (gObj.dCode > 0 && m_fCanvasPixelResolution > m_fDrawArcResolution) // 1/10 of Monitor Pixel resolution
 	{
@@ -7287,19 +7292,19 @@ BOOL CSimple274X::MySnRObjList(GraphObj &gObj, int nObjIndex, float ddX, float d
  					//}
 				}
 
-				CurTimer = GetTickCount();
-				bTrig = (int(CurTimer - StartTimer) % 300) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
-				nRpt = int(CurTimer - StartTimer) % 300;
-				if (bTrig)
-				{
-					nRpt = 0;
-					pParent->ProgressSet(j + nYRepeat * i);
-					if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
-					{
-						::TranslateMessage(&message);
-						::DispatchMessage(&message);
-					}
-				}
+				//CurTimer = GetTickCount();
+				//bTrig = (int(CurTimer - StartTimer) % 100) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
+				//nRpt = int(CurTimer - StartTimer) % 100;
+				//if (bTrig)
+				//{
+				//	nRpt = 0;
+				//	pParent->ProgressSet(j + nYRepeat * i);
+				//	if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+				//	{
+				//		::TranslateMessage(&message);
+				//		::DispatchMessage(&message);
+				//	}
+				//}
 
 			}
 		}
@@ -7315,34 +7320,40 @@ BOOL CSimple274X::MySnRObjList(GraphObj &gObj, int nObjIndex, float ddX, float d
 
 				if (i != 0 || j != 0)
 				{
-					for (int k = nStObj; k <= nEdObj; k++)
+					if (nEdObj < 360) // DetGcode
 					{
-						cBoundRect.X1 = gObj.Extent.X1 + dX;
-						cBoundRect.Y1 = gObj.Extent.Y1 + dY;
-						cBoundRect.X2 = gObj.Extent.X2 + dX;
-						cBoundRect.Y2 = gObj.Extent.Y2 + dY;
-
-						if (CheckDrawAllow(cBoundRect))
+						for (int k = nStObj; k <= nEdObj; k++)
 						{
-							MyObjEntityShift(k, dX, dY);
+							cBoundRect.X1 = gObj.Extent.X1 + dX;
+							cBoundRect.Y1 = gObj.Extent.Y1 + dY;
+							cBoundRect.X2 = gObj.Extent.X2 + dX;
+							cBoundRect.Y2 = gObj.Extent.Y2 + dY;
+
+							if (CheckDrawAllow(cBoundRect))
+							{
+								MyObjEntityShift(k, dX, dY);
+							}
 						}
 					}
+					else
+						int kkk = 0;
+
 					//Sleep(30);
 				}
 
-				CurTimer = GetTickCount();
-				bTrig = (int(CurTimer - StartTimer) % 300) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
-				nRpt = int(CurTimer - StartTimer) % 300;
-				if (bTrig)
-				{
-					nRpt = 0;
-					pParent->ProgressSet(j + nYRepeat * i);
-					if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
-					{
-						::TranslateMessage(&message);
-						::DispatchMessage(&message);
-					}
-				}
+				//CurTimer = GetTickCount();
+				//bTrig = (int(CurTimer - StartTimer) % 100) < nRpt ? TRUE : FALSE; // 100mSec간격으로 ProgressBar 진행.
+				//nRpt = int(CurTimer - StartTimer) % 100;
+				//if (bTrig)
+				//{
+				//	nRpt = 0;
+				//	pParent->ProgressSet(j + nYRepeat * i);
+				//	if (::PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+				//	{
+				//		::TranslateMessage(&message);
+				//		::DispatchMessage(&message);
+				//	}
+				//}
 
 			}
 			//Sleep(30);
@@ -7350,8 +7361,8 @@ BOOL CSimple274X::MySnRObjList(GraphObj &gObj, int nObjIndex, float ddX, float d
 		//Sleep(30);
 	}
 
-	pParent->ProgressSet(nTotRpt);
-	pParent->ProgressActivate(FALSE);//pParent->ProgressClose();
+	//pParent->ProgressSet(nTotRpt);
+	//pParent->ProgressActivate(FALSE);//pParent->ProgressClose();
 
 	return bFind;
 }
