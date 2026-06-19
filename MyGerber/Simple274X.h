@@ -339,6 +339,12 @@ struct ParamIP	// Parameter 'IP'(Image Polarity) data structure
 		bLayerPolarity = LAYER_TYPE::POSITIVE;
 	}
 
+	void Reset()
+	{
+		PolChangeFlag = FALSE;
+		bLayerPolarity = LAYER_TYPE::POSITIVE;
+	}
+
 	BOOL PolChangeFlag;
 	BOOL bLayerPolarity;
 };
@@ -350,6 +356,13 @@ struct ParamFS	// Parameter 'FS'(Format Statement) data structure
 		bSuppress = FALSE;
 		bAbsolute = TRUE;
 	}
+
+	void Reset()
+	{
+		bSuppress = FALSE;
+		bAbsolute = TRUE;
+	}
+
 	BOOL bSuppress; //  (FALSE) : 'Leading Zero omitted , (TRUE) : 'Trailing Zero omitted
 	BOOL bAbsolute; // 'A' or 'I':  Use A for absolute coordinate values, Use I for incremental coordinate values
 };
@@ -357,6 +370,12 @@ struct ParamFS	// Parameter 'FS'(Format Statement) data structure
 struct ParamMI	// Parameter 'MI'(Mirror Image) data structure
 {
 	ParamMI()
+	{
+		bMirrorX = FALSE;
+		bMirrorY = FALSE;
+	}
+
+	void Reset()
 	{
 		bMirrorX = FALSE;
 		bMirrorY = FALSE;
@@ -373,6 +392,14 @@ struct ParamSR	// Parameter 'SR'(Step & Repeat) data structure
 		nYRepeat = 0;
 		psRepeat = 0;
 	}
+
+	void Reset()
+	{
+		nXRepeat = 0;
+		nYRepeat = 0;
+		psRepeat = 0;
+	}
+		
 	int nXRepeat, nYRepeat;
 	int psRepeat;
 };
@@ -383,6 +410,12 @@ struct ParamAD	// Parameter 'AD'(Aperture Discription) data structure
 	{
 		bExposureMode = FALSE;
 	}
+
+	void Reset()
+	{
+		bExposureMode = FALSE;
+	}
+
 	BOOL bExposureMode;
 };
 

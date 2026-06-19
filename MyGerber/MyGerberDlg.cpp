@@ -409,7 +409,7 @@ BOOL CMyGerberDlg::FileBrowse(CString& sPath)
 	int nAoiMachineNum = 0;
 
 	// File Open Filter 
-	static TCHAR BASED_CODE szFilter[] = _T("Gerber Files (*.gbr;*.m00)|*.gbr;*.m00|All Files (*.*)|*.*||");
+	static TCHAR BASED_CODE szFilter[] = _T("Gerber Files (*.gbr;*.gbx;*.m00)|*.gbr;*.gbx;*.m00|All Files (*.*)|*.*||");
 
 	// CFileDialog 
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, szFilter, NULL);

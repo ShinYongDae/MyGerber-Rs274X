@@ -4645,6 +4645,12 @@ void CSimple274X::ResetData()
 	m_bImageSave = FALSE;
 
 	m_fptCoord.x = 0.0; m_fptCoord.y = 0.0; 
+
+	m_paramIP.Reset();
+	m_paramFS.Reset();
+	m_paramMI.Reset();
+	m_paramSR.Reset();
+	m_paramAD.Reset();
 }
 
 void CSimple274X::ResetDataObject(GraphObj &gObj)
@@ -4737,24 +4743,32 @@ void CSimple274X::StepAndRepeating(FRECTC &Extent, BOOL bClearObjectData)
 	m_MnMxSnR = GetLayerMaxExtent();
 	if ((m_paramSR.nXRepeat - 1) * m_fStepX > 0)
 	{
-		if (m_gObj.Extent.X1 < m_MnMxSnR.X1) m_MnMxSnR.X1 = m_gObj.Extent.X1;
-		if (m_gObj.Extent.X2 + (m_paramSR.nXRepeat - 1) * m_fStepX > m_MnMxSnR.X2) m_MnMxSnR.X2 = m_gObj.Extent.X2 + (m_paramSR.nXRepeat - 1) * m_fStepX;
+		if (m_gObj.Extent.X1 < m_MnMxSnR.X1) 
+			m_MnMxSnR.X1 = m_gObj.Extent.X1;
+		if (m_gObj.Extent.X2 + (m_paramSR.nXRepeat - 1) * m_fStepX > m_MnMxSnR.X2) 
+			m_MnMxSnR.X2 = m_gObj.Extent.X2 + (m_paramSR.nXRepeat - 1) * m_fStepX;
 	}
 	else
 	{
-		if (m_gObj.Extent.X1 + (m_paramSR.nXRepeat - 1) * m_fStepX < m_MnMxSnR.X1) m_MnMxSnR.X1 = m_gObj.Extent.X1 + (m_paramSR.nXRepeat - 1) * m_fStepX;
-		if (m_gObj.Extent.X2 > m_MnMxSnR.X2) m_MnMxSnR.X2 = m_gObj.Extent.X2;
+		if (m_gObj.Extent.X1 + (m_paramSR.nXRepeat - 1) * m_fStepX < m_MnMxSnR.X1) 
+			m_MnMxSnR.X1 = m_gObj.Extent.X1 + (m_paramSR.nXRepeat - 1) * m_fStepX;
+		if (m_gObj.Extent.X2 > m_MnMxSnR.X2) 
+			m_MnMxSnR.X2 = m_gObj.Extent.X2;
 	}
 
 	if ((m_paramSR.nYRepeat - 1) * m_fStepY > 0)
 	{
-		if (m_gObj.Extent.Y1 < m_MnMxSnR.Y1) m_MnMxSnR.Y1 = m_gObj.Extent.Y1;
-		if (m_gObj.Extent.Y2 + (m_paramSR.nYRepeat - 1) * m_fStepY > m_MnMxSnR.Y2) m_MnMxSnR.Y2 = m_gObj.Extent.Y2 + (m_paramSR.nYRepeat - 1) * m_fStepY;
+		if (m_gObj.Extent.Y1 < m_MnMxSnR.Y1) 
+			m_MnMxSnR.Y1 = m_gObj.Extent.Y1;
+		if (m_gObj.Extent.Y2 + (m_paramSR.nYRepeat - 1) * m_fStepY > m_MnMxSnR.Y2) 
+			m_MnMxSnR.Y2 = m_gObj.Extent.Y2 + (m_paramSR.nYRepeat - 1) * m_fStepY;
 	}
 	else
 	{
-		if (m_gObj.Extent.Y1 + (m_paramSR.nYRepeat - 1) * m_fStepY < m_MnMxSnR.Y1) m_MnMxSnR.Y1 = m_gObj.Extent.Y1 + (m_paramSR.nYRepeat - 1) * m_fStepY;
-		if (m_gObj.Extent.Y2 > m_MnMxSnR.Y2) m_MnMxSnR.Y2 = m_gObj.Extent.Y2;
+		if (m_gObj.Extent.Y1 + (m_paramSR.nYRepeat - 1) * m_fStepY < m_MnMxSnR.Y1) 
+			m_MnMxSnR.Y1 = m_gObj.Extent.Y1 + (m_paramSR.nYRepeat - 1) * m_fStepY;
+		if (m_gObj.Extent.Y2 > m_MnMxSnR.Y2) 
+			m_MnMxSnR.Y2 = m_gObj.Extent.Y2;
 	}
 
 	SetLayerMaxExtent(m_MnMxSnR);
